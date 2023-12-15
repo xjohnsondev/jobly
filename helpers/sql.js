@@ -1,6 +1,7 @@
 const { BadRequestError } = require("../expressError");
 
-// THIS NEEDS SOME GREAT DOCUMENTATION.
+// This route handles updates of rows in the user and company models.
+// Validates that user has inputed data to alter, then performs alteration.
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);

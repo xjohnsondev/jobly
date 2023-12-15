@@ -11,9 +11,9 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companySearchSchema = require("../schemas/companySearch.json");
 
 const router = new express.Router();
-
 
 /** POST / { company } =>  { company }
  *
@@ -28,7 +28,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyNewSchema);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
 
@@ -51,13 +51,45 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  let companies;
+  // console.log(req.query)
   try {
-    const companies = await Company.findAll();
+    if (Object.keys(req.query).length == 0) {
+      companies = await Company.findAll();
+    } else {
+      // converts min and max values to ints if they exist in query, 
+      // or else use default values
+      // sets name to default value of '%' if not in query
+      let q = req.query;
+      if (!q.name) q.name = ("%");
+      (!q.min) ? q.min = 0 : q.min = Number(q.min);
+      (!q.max) ? q.max = 100000000 : q.max = Number(q.max);
+
+      const validator = jsonschema.validate(q, companySearchSchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
+      companies = await Company.findFilter(q.name, q.min, q.max);
+    }
     return res.json({ companies });
-  } catch (err) {
-    return next(err);
+  } catch (e) {
+    next(e)
   }
 });
+
+// router.get("/:filter", async function (req, res, next) {
+//   try {
+//     let companies;
+//     if (req.params.filter !== "minEmployees" || req.params.filter !== "maxEmployees"){
+//       companies = await Company.findFilter(req.params.filter)
+
+//     } else (req.params.filter === "")
+//     return res.json({ companies });
+//   } catch (err) {
+//     return next(err);
+//   }
+// });
 
 /** GET /[handle]  =>  { company }
  *
@@ -91,7 +123,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyUpdateSchema);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
 
@@ -115,6 +147,5 @@ router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
     return next(err);
   }
 });
-
 
 module.exports = router;
