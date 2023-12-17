@@ -23,7 +23,6 @@ const router = new express.Router();
  *
  * Authorization required: login
  */
-
 router.post("/", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyNewSchema);
@@ -49,7 +48,6 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  *
  * Authorization required: none
  */
-
 router.get("/", async function (req, res, next) {
   let companies;
   // console.log(req.query)
@@ -78,19 +76,6 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-// router.get("/:filter", async function (req, res, next) {
-//   try {
-//     let companies;
-//     if (req.params.filter !== "minEmployees" || req.params.filter !== "maxEmployees"){
-//       companies = await Company.findFilter(req.params.filter)
-
-//     } else (req.params.filter === "")
-//     return res.json({ companies });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
-
 /** GET /[handle]  =>  { company }
  *
  *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
@@ -98,7 +83,6 @@ router.get("/", async function (req, res, next) {
  *
  * Authorization required: none
  */
-
 router.get("/:handle", async function (req, res, next) {
   try {
     const company = await Company.get(req.params.handle);
@@ -118,7 +102,6 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Authorization required: login
  */
-
 router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyUpdateSchema);
@@ -138,7 +121,6 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
  *
  * Authorization: login
  */
-
 router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
   try {
     await Company.remove(req.params.handle);
@@ -147,5 +129,6 @@ router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
     return next(err);
   }
 });
+
 
 module.exports = router;
