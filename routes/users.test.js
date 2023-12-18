@@ -12,6 +12,7 @@ const {
   commonAfterEach,
   commonAfterAll,
   u1Token,
+  testJob
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -286,5 +287,13 @@ describe("DELETE /users/:username", function () {
         .delete(`/users/nope`)
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(404);
+  });
+});
+
+describe("POST /users/:username/jobs/:id", function () {
+  test("works for admin", async function () {
+    const resp = await request(app)
+        .post(`/users/u1/jobs/${testJob[0].id}`)
+    expect(resp.body).toEqual({ applied: testJob[0].id });
   });
 });
