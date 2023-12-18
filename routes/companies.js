@@ -49,9 +49,9 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 router.get("/", async function (req, res, next) {
-  let companies;
   // console.log(req.query)
   try {
+    let companies;
     if (Object.keys(req.query).length == 0) {
       companies = await Company.findAll();
     } else {

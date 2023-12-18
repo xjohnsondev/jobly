@@ -55,6 +55,29 @@ class Job {
     return jobs;
   }
 
+  /** Find jobs filtered by tile, minSalary, and/or hasEquity.
+   *
+   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   * */
+  static async findFilter(title, minSalary, hasEquity) {
+    let equityCheck = hasEquity === true ? "> 0" : ">= 0";
+
+    const jobsRes = await db.query(
+      `
+    SELECT title,
+    salary,
+    equity,
+    company_handle
+    FROM jobs
+    WHERE title ILIKE '%${title}%'
+    AND salary >= $1
+    AND equity ${equityCheck}`,
+      [minSalary]
+    );
+
+    return jobsRes.rows;
+  }
+
   /** Given a job id, return data about job.
    *
    * Returns { title, salary, equity, company_handle }

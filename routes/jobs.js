@@ -2,6 +2,7 @@
 
 const jsonschema = require("jsonschema");
 const jobNewSchema = require("../schemas/jobNew.json")
+const jobSearchSchema = require("../schemas/jobSearch.json")
 
 const express = require("express");
 const {
@@ -39,13 +40,35 @@ router.post("/", async function (req, res, next) {
   }
 });
 
-/** Find all jobs.
-   *
-   * Returns [{ title, salary, equity, company_handle }, ...]
-   * */
+/** GET /  =>
+ *   { results: [ { title, salary, equity, company_handle }, ...] }
+ *
+ * Can filter on provided search filters:
+ * - title
+ * - minSalary
+ * - hasEquity
+ *
+ * Authorization required: none
+ */
 router.get("/", async function(req, res, next) {
   try {
-    const results = await Job.findAll();
+    let results;
+    console.log(req.query)
+    if (Object.keys(req.query).length == 0) {
+      results = await Job.findAll();
+    } else {
+      let q = req.query
+      if (!q.title) q.title = ("%");
+      (!q.minSalary) ? q.minSalary = Number(0) : q.minSalary = Number(q.minSalary);
+      (!q.hasEquity) ? q.hasEquity = Boolean(false) : q.hasEquity = Boolean(true); 
+      
+      const validator = jsonschema.validate(q, jobSearchSchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
+      results = await Job.findFilter(q.title, q.minSalary, q.hasEquity)
+    }
     return res.json({results});
   } catch (e) {
     next(e)

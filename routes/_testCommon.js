@@ -61,6 +61,7 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: false,
   });
+  
   await Job.create({
     title: "job1",
     salary: 100000,

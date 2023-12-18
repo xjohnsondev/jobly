@@ -57,7 +57,7 @@ class Company {
     return companiesRes.rows;
   }
 
-  /** Find companies filtered by name.
+  /** Find companies filtered by name, minEmployees, and/or maxEmployees.
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
