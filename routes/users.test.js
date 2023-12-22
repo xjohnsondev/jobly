@@ -294,6 +294,11 @@ describe("POST /users/:username/jobs/:id", function () {
   test("works for admin", async function () {
     const resp = await request(app)
         .post(`/users/u1/jobs/${testJob[0].id}`)
-    expect(resp.body).toEqual({ applied: testJob[0].id });
+    expect(resp.body).toBe({ applied: {
+      company_handle: "c1",
+      equity: "0.5",
+      salary: 100000,
+      title: "job1",
+    }});
   });
 });
